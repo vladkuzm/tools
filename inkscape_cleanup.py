@@ -7,7 +7,7 @@ from lxml import etree
 DEBUG = True
 
 def get_opts(raw_str):
-    opt_list = raw_str.split(";")
+    opt_list = raw_str.strip(";").split(";")
     opt_list = [(x + ';') for x in opt_list]
     return opt_list
 
@@ -19,10 +19,15 @@ def get_new_style(raw_str):
     return ''.join(opt_list)
 
 def is_target(elm):
-    if (elm.get("style") is None or
-        "fill:currentColor;" not in get_opts(elm.get("style"))):
-        return False
-    return True
+    style_attr = elm.get("style")
+    if (style_attr is not None and
+        "fill:currentColor" in get_opts(style_attr)):
+        opts = get_opts(style_attr)
+        for opt in opts:
+            if (opt.startswith("color:")):
+                return True
+        
+    return False
 
 def set_proper_style(elm):
     new_style = get_new_style(elm.get("style"))
